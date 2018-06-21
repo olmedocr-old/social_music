@@ -1,4 +1,4 @@
-# social_music
+# Social Music App
 
 A new Flutter application.
 
