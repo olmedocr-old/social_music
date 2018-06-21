@@ -1,0 +1,59 @@
+{
+  "project_info": {
+    "project_number": "924211986379",
+    "firebase_url": "https://social-music-7b288.firebaseio.com",
+    "project_id": "social-music-7b288",
+    "storage_bucket": "social-music-7b288.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:924211986379:android:7eacfc617334e178",
+        "android_client_info": {
+          "package_name": "com.raulolmedo.socialmusic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "924211986379-qdnqm05298pt4q0dnkl26qku9gld96qs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.raulolmedo.socialmusic",
+            "certificate_hash": "97b147e215776e485ac780a20a8bb78491b54e38"
+          }
+        },
+        {
+          "client_id": "924211986379-0t9aptpcqf289180cibpt15mjp69gfar.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "924211986379-0t9aptpcqf289180cibpt15mjp69gfar.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIlMRHEneoP18cEOHpqW7qTbzl-V5RF_4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "924211986379-0t9aptpcqf289180cibpt15mjp69gfar.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
