@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:social_music/tab_admin_settings.dart';
+import 'package:social_music/admin/tab_admin_settings.dart';
 
 class AdminScreen extends StatefulWidget {
   AdminScreen({Key key, this.title}) : super(key: key);

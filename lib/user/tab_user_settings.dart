@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/services.dart';
 
-import 'firebase_authentication.dart' as firebase_auth;
+import 'package:social_music/firebase_authentication.dart' as firebase_auth;
 
 class TabUserSettings extends StatefulWidget {
   @override
