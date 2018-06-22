@@ -5,10 +5,9 @@ import 'firebase_authentication.dart';
 import 'screen_admin.dart';
 import 'screen_user.dart';
 
-//import 'package:spotify/spotify_io.dart';
-
 void main() async {
   //FIXME: this shouldn't be here. it penalizes the app startup and can hang if no internet
+  //TODO: sacar un popup y elegir si es consumer o producer y hacer un setstate en funcion de eso, no comprobando el mail
   FirebaseUser user = await handleSignIn();
   runApp(new MyApp(user: user));
 }

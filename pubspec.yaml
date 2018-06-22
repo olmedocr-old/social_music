@@ -11,6 +11,7 @@ dependencies:
   flutter_webview_plugin: "^0.1.6"
   oauth2: "^1.2.1"
   qr_flutter: "^1.1.1"
+  path_provider: "^0.4.1"
   barcode_scan: "^0.0.4"
   spotify:
     git:

@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 
-import 'spotify_authentication.dart' as spotify_auth;
+import 'spotify_authentication.dart';
 
 class TabAdminSettings extends StatefulWidget {
   @override
@@ -9,21 +12,41 @@ class TabAdminSettings extends StatefulWidget {
 }
 
 class TabAdminSettingsState extends State<TabAdminSettings> {
+  final String clientId = '307123396078430cbeba39351bfb014c';
+  final String clientSecret = '34321de4e92340e9919e033b7629ef55';
+  final String redirectUrl = null; //TODO: raulolmedo.com/callback
+  final List<String> scopes = ["user-library-read"];
+
   bool _isDataReady;
 
-  void _toggleQrButton() {
-    setState(() {
-      _isDataReady ? _generateQr() : _generateSnackBar();
-    });
+  _onTap() async {
+    bool success = await Navigator.of(context).push(new MaterialPageRoute<bool>(
+          builder: (BuildContext context) => new SpotifyLoginWebViewPage(
+                clientId: this.clientId,
+                clientSecret: this.clientSecret,
+                redirectUrl: this.redirectUrl == null
+                    ? "https://kunstmaan.github.io/flutter_slack_oauth/success.html"
+                    : this.redirectUrl,
+                scopes: this.scopes,
+              ),
+        ));
+
+    if (success == null) {
+      _generateSnackBar("Webview closed");
+    } else if (success == false) {
+      _generateSnackBar("Login failed");
+    } else if (success) {
+      _isDataReady = true;
+      _generateSnackBar("Success");
+    }
   }
 
-  void _generateSnackBar() {
+  void _generateSnackBar(String text) {
     final snackBar = SnackBar(
       duration: Duration(seconds: 5),
       content: Padding(
         padding: EdgeInsets.all(8.0),
-        child:
-            Text('You must log in first into Spotify to generate the QR code'),
+        child: Text(text),
       ),
       action: SnackBarAction(
         label: 'OK',
@@ -35,7 +58,21 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
     Scaffold.of(context).showSnackBar(snackBar);
   }
 
-  void _generateQr() {
+  void _qrButtonPressed() {
+    setState(() {
+      _isDataReady
+          ? _generateQr()
+          : _generateSnackBar(
+              'You must log in first into Spotify to generate the QR code');
+    });
+  }
+
+  void _generateQr() async{
+    Directory tempDir = await getTemporaryDirectory();
+    File credentialsFile = File('${tempDir.path}/credentials');
+
+    print(credentialsFile.readAsStringSync());
+
     showModalBottomSheet<void>(
         context: context,
         builder: (BuildContext context) {
@@ -44,7 +81,8 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
               padding: EdgeInsets.all(32.0),
               child: Center(
                 child: QrImage(
-                  data: "1234567890",
+                  version: 14,
+                  data: credentialsFile.readAsStringSync(),
                   size: 300.0,
                 ),
               ),
@@ -69,10 +107,7 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
             child: Text("Login into Spotify"),
             onPressed: () {
               print("Spotify login");
-              spotify_auth
-                  .handleSignIn()
-                  .then((onValue) {})
-                  .catchError((e) => print(e));
+              _onTap();
             },
           ),
           Padding(
@@ -80,7 +115,7 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
           ),
           RaisedButton(
             child: Text("Generate QR"),
-            onPressed: _toggleQrButton,
+            onPressed: _qrButtonPressed,
           ),
         ],
       ),
