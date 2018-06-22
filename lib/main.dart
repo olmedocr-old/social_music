@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'firebase_authentication.dart';
-import 'screen_admin.dart';
-import 'screen_user.dart';
-
-//import 'package:spotify/spotify_io.dart';
+import 'package:social_music/admin/screen_admin.dart';
+import 'package:social_music/user/screen_user.dart';
 
 void main() async {
   //FIXME: this shouldn't be here. it penalizes the app startup and can hang if no internet
+  //TODO: sacar un popup y elegir si es consumer o producer y hacer un setstate en funcion de eso, no comprobando el mail
   FirebaseUser user = await handleSignIn();
   runApp(new MyApp(user: user));
 }

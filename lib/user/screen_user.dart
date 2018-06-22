@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'tab_user_settings.dart';
+import 'package:social_music/user/tab_user_settings.dart';
 
 class UserScreen extends StatefulWidget{
   UserScreen({Key key, this.title}) : super(key: key);
