@@ -1,32 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
 
 import 'firebase_authentication.dart';
 import 'package:social_music/admin/screen_admin.dart';
 import 'package:social_music/user/screen_user.dart';
 
 void main() async {
-  //FIXME: this shouldn't be here. it penalizes the app startup and can hang if no internet
-  //TODO: sacar un popup y elegir si es consumer o producer y hacer un setstate en funcion de eso, no comprobando el mail
-  FirebaseUser user = await handleSignIn();
-  runApp(new MyApp(user: user));
+  runApp(new MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({Key key, this.user})
-      : super(key: key); // This widget is the root of your application.
-  final FirebaseUser user;
+  StatelessWidget _onAppStart(BuildContext context) {
+    Widget page;
+
+    _selectPage(context).then((onValue) {
+      page = onValue;
+    });
+
+    return page;
+  }
+
+  Future<StatelessWidget> _selectPage(context) async {
+    FirebaseUser user = await handleSignIn();
+
+    StatelessWidget page = await Navigator.push(
+        context,
+        new MaterialPageRoute<StatelessWidget>(
+          builder: (BuildContext context) => SimpleDialog(
+                title: Text("Select option"),
+                children: <Widget>[
+                  SimpleDialogOption(
+                    onPressed: () {
+                      Navigator.pop(context,
+                          AdminHomePage(title: 'Social Music Admin Page'));
+                    },
+                    child: Text("Admin"),
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () {
+                      Navigator.pop(context,
+                          UserHomePage(title: 'Social Music Home Page'));
+                    },
+                    child: Text("User"),
+                  ),
+                ],
+              ),
+        ));
+
+    return page;
+  }
 
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-        title: 'Social Music',
-        theme: new ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: user.email == 'rauleteolmedo@gmail.com'
-            ? new AdminHomePage(title: 'Social Music Admin Page')
-            : new UserHomePage(title: 'Social Music Home Page'));
+      title: 'Social Music',
+      theme: new ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: _onAppStart(context),
+    );
   }
 }
 
