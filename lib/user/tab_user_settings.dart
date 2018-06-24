@@ -12,7 +12,7 @@ class TabUserSettings extends StatefulWidget {
 }
 
 class TabUserSettingsState extends State<TabUserSettings> {
-  String barcode = "";
+  String spotifyCredetials = "";
 
   @override
   void initState() {
@@ -57,14 +57,10 @@ class TabUserSettingsState extends State<TabUserSettings> {
             child: Text("Scan QR code"),
             onPressed: scanBarcode,
           ),
-          Text(barcode),
+          Text(spotifyCredetials),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.0),
           ),
-          RaisedButton(
-            child: Text("Auth to spotify"),
-            onPressed: () {},
-          )
         ],
       ),
     );
@@ -73,20 +69,20 @@ class TabUserSettingsState extends State<TabUserSettings> {
   Future scanBarcode() async {
     try {
       String barcode = await BarcodeScanner.scan();
-      setState(() => this.barcode = barcode);
+      setState(() => this.spotifyCredetials = barcode);
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {
-        setState(() {
-          this.barcode = 'The user did not grant the camera permission!';
-        });
+        print('The user did not grant the camera permission!');
+        //TODO: show popup alerting the user to go to settings and grant access
       } else {
-        setState(() => this.barcode = 'Unknown error: $e');
+        print('Unknown error_ $e');
       }
     } on FormatException {
-      setState(() => this.barcode =
+      print(
           'null (User returned using the "back"-button before scanning anything. Result)');
+      //TODO: show snackbar
     } catch (e) {
-      setState(() => this.barcode = 'Unknown error: $e');
+      print('Unknown error_ $e');
     }
   }
 }

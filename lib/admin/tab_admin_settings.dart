@@ -17,26 +17,28 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
   final String redirectUrl = null; //TODO: raulolmedo.com/callback
   final List<String> scopes = ["user-library-read"];
 
-  bool _isDataReady;
+  bool _isLoginDataReady = false;
+  bool _isSessionDataReady = false;
 
   _onTap() async {
     bool success = await Navigator.of(context).push(new MaterialPageRoute<bool>(
-          builder: (BuildContext context) => new SpotifyLoginWebViewPage(
-                clientId: this.clientId,
-                clientSecret: this.clientSecret,
-                redirectUrl: this.redirectUrl == null
-                    ? "https://kunstmaan.github.io/flutter_slack_oauth/success.html"
-                    : this.redirectUrl,
-                scopes: this.scopes,
-              ),
-        ));
+      builder: (BuildContext context) =>
+      new SpotifyLoginWebViewPage(
+        clientId: this.clientId,
+        clientSecret: this.clientSecret,
+        redirectUrl: this.redirectUrl == null
+            ? "https://kunstmaan.github.io/flutter_slack_oauth/success.html"
+            : this.redirectUrl,
+        scopes: this.scopes,
+      ),
+    ));
 
     if (success == null) {
       _generateSnackBar("Webview closed");
     } else if (success == false) {
       _generateSnackBar("Login failed");
     } else if (success) {
-      _isDataReady = true;
+      _isLoginDataReady = true;
       _generateSnackBar("Success");
     }
   }
@@ -60,14 +62,22 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
 
   void _qrButtonPressed() {
     setState(() {
-      _isDataReady
-          ? _generateQr()
-          : _generateSnackBar(
-              'You must log in first into Spotify to generate the QR code');
+      if (_isLoginDataReady && _isSessionDataReady) {
+        _generateQr();
+      } else if (!_isLoginDataReady) {
+        _generateSnackBar(
+            'You must login first into Spotify to generate the QR code');
+      } else if (!_isSessionDataReady) {
+        _generateSnackBar(
+            "You must create a session before generating the QR code");
+      } else {
+        _generateSnackBar(
+            "You must login into Spotify and create a session to generate the QR code");
+      }
     });
   }
 
-  void _generateQr() async{
+  void _generateQr() async {
     Directory tempDir = await getTemporaryDirectory();
     File credentialsFile = File('${tempDir.path}/credentials');
 
@@ -93,7 +103,6 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
 
   @override
   void initState() {
-    _isDataReady = false;
     super.initState();
   }
 

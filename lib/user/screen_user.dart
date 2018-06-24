@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'package:social_music/user/tab_user_settings.dart';
 
 class UserScreen extends StatefulWidget{
-  UserScreen({Key key, this.title}) : super(key: key);
+  UserScreen({Key key, this.title, this.app}) : super(key: key);
   final String title;
+  final FirebaseApp app;
 
   @override
   State createState() => UserScreenState();
