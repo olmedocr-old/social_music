@@ -3,8 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'tab_admin_sessions.dart';
 
 import 'package:social_music/spotify_authentication.dart';
+
+bool isLoginDataReady = false;
+bool isSessionDataReady = false;
 
 class TabAdminSettings extends StatefulWidget {
   @override
@@ -16,9 +20,6 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
   final String clientSecret = '34321de4e92340e9919e033b7629ef55';
   final String redirectUrl = null; //TODO: raulolmedo.com/callback
   final List<String> scopes = ["user-library-read"];
-
-  bool _isLoginDataReady = false;
-  bool _isSessionDataReady = false;
 
   _onTap() async {
     bool success = await Navigator.of(context).push(new MaterialPageRoute<bool>(
@@ -38,7 +39,7 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
     } else if (success == false) {
       _generateSnackBar("Login failed");
     } else if (success) {
-      _isLoginDataReady = true;
+      isLoginDataReady = true;
       _generateSnackBar("Success");
     }
   }
@@ -62,12 +63,12 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
 
   void _qrButtonPressed() {
     setState(() {
-      if (_isLoginDataReady && _isSessionDataReady) {
+      if (isLoginDataReady && isSessionDataReady) {
         _generateQr();
-      } else if (!_isLoginDataReady) {
+      } else if (!isLoginDataReady) {
         _generateSnackBar(
             'You must login first into Spotify to generate the QR code');
-      } else if (!_isSessionDataReady) {
+      } else if (!isSessionDataReady) {
         _generateSnackBar(
             "You must create a session before generating the QR code");
       } else {
@@ -91,8 +92,8 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
               padding: EdgeInsets.all(32.0),
               child: Center(
                 child: QrImage(
-                  version: 14,
-                  data: credentialsFile.readAsStringSync(),
+                  version: 15,
+                  data: credentialsFile.readAsStringSync() + userId,
                   size: 300.0,
                 ),
               ),

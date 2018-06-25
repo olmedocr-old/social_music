@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         theme: new ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: user.email == 'rauleteolmedo@gmail.com'
+        home: user.email == 'raul.olmedo.checa@gmail.com'
             ? new AdminHomePage(title: 'Social Music Admin Page', user: this.user)
             : new UserHomePage(title: 'Social Music Home Page'));
   }

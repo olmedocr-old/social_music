@@ -6,58 +6,94 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'tab_admin_settings.dart';
+import 'package:social_music/session.dart';
+
+String userId;
 
 class TabAdminSession extends StatefulWidget {
-  TabAdminSession({Key key, this.title, this.database, this.user})
+  TabAdminSession(
+      {Key key, this.user, this.rootReference, this.activeSessionReference})
       : super(key: key);
-  final String title;
-  final FirebaseDatabase database;
   final FirebaseUser user;
+  final DatabaseReference activeSessionReference;
+  final DatabaseReference rootReference;
 
   @override
   State createState() => new TabAdminSessionState();
 }
 
 class TabAdminSessionState extends State<TabAdminSession> {
-  DatabaseReference _activeSessionReference;
-  StreamSubscription<Event> _activeSessionSubscription;
-  DatabaseError _error;
+  bool _sessionActive = false;
+  DatabaseReference newChild;
+
+  _addSession() {
+    if (!_sessionActive){
+      widget.rootReference.update({widget.user.uid: ""});
+      newChild = widget.rootReference.child(widget.user.uid);
+      newChild.set(new Session(widget.user.displayName).toMap());
+
+      userId = widget.user.uid;
+      _sessionActive = true;
+      isSessionDataReady = true;
+    } else {
+      _generateSnackBar("Session already active, delete it first");
+    }
+
+  }
+
+  _removeSession(){
+    widget.rootReference.child(widget.user.uid).remove();
+
+    _sessionActive = false;
+    isSessionDataReady = false;
+  }
+
+  void _generateSnackBar(String text) {
+    final snackBar = SnackBar(
+      duration: Duration(seconds: 5),
+      content: Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Text(text),
+      ),
+      action: SnackBarAction(
+        label: 'OK',
+        onPressed: () {
+          Scaffold.of(context).hideCurrentSnackBar();
+        },
+      ),
+    );
+    Scaffold.of(context).showSnackBar(snackBar);
+  }
 
   @override
   void initState() {
-    //TODO: lo mismo por ser tabs y estar esto rulando todo el rato se me va a la puta todo
     super.initState();
-    print("initState TabAdminSessionState");
-    _activeSessionReference =
-        widget.database.reference().child(widget.user.uid);
-
-    _activeSessionSubscription =
-        _activeSessionReference.onValue.listen((Event event) {
-      setState(() {});
-    }, onError: (Object o) {
-      final DatabaseError error = o;
-      setState(() {
-        _error = error;
-      });
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    print("build TabAdminSessionState");
     return Column(
       children: <Widget>[
         Text("Active sessions"),
         Flexible(
           child: FirebaseAnimatedList(
-            query: _activeSessionReference,
+            defaultChild: CircularProgressIndicator(),
+            query: widget.rootReference.child(widget.user.uid),
             itemBuilder: (BuildContext context, DataSnapshot snapshot,
                 Animation<double> animation, int index) {
               return new SizeTransition(
                 sizeFactor: animation,
                 child: ListTile(
                   leading: Image.network(widget.user.photoUrl),
+                  //TODO: take only the child with the name, maybe is a listener problem
                   title: Text("Session author ${snapshot.value}"),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      _removeSession();
+                    },
+                  ),
                 ),
               );
             },
@@ -69,7 +105,7 @@ class TabAdminSessionState extends State<TabAdminSession> {
             alignment: Alignment.bottomRight,
             child: FloatingActionButton(
               onPressed: () {
-                //TODO: change isSessionReady to true and send the uid to be encoded in the qr
+                _addSession();
               },
               child: Icon(Icons.add),
             ),
