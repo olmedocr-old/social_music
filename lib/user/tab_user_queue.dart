@@ -67,6 +67,15 @@ class TabUserQueueState extends State<TabUserQueue> {
 
   @override
   Widget build(BuildContext context) {
-    return Text("Text");
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Align(
+        alignment: Alignment.bottomRight,
+        child: FloatingActionButton(
+          onPressed: () {},
+          child: Icon(Icons.add),
+        ),
+      ),
+    );
   }
 }

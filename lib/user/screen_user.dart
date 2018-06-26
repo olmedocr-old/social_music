@@ -23,7 +23,8 @@ class UserScreenState extends State<UserScreen> {
   FirebaseDatabase database;
   DatabaseError _error;
   DatabaseReference activeSessionReference;
-  DatabaseReference rootReference;
+  DatabaseReference nextSongsReference;
+  DatabaseReference nowPlayingReference;
   StreamSubscription<Event> activeSessionSubscription;
 
   @override
@@ -34,7 +35,8 @@ class UserScreenState extends State<UserScreen> {
     database.setPersistenceCacheSizeBytes(10000000);
 
     activeSessionReference = database.reference().child(widget.user.uid);
-    rootReference = database.reference().root();
+    nextSongsReference = activeSessionReference.child("nextSongs");
+    nowPlayingReference = activeSessionReference.child("nowPlaying");
 
     activeSessionSubscription =
         activeSessionReference.onValue.listen((Event event) {

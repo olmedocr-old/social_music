@@ -37,6 +37,7 @@ class TabAdminSessionState extends State<TabAdminSession> {
       _sessionActive = true;
       isSessionDataReady = true;
     } else {
+      //TODO: if the session already exists, manage the boolean that allows the wr creation and session addition
       _generateSnackBar("Session already active, delete it first");
     }
 
@@ -97,19 +98,6 @@ class TabAdminSessionState extends State<TabAdminSession> {
                 ),
               );
             },
-          ),
-        ),
-        //TODO: change layout from Column to other thing to ensure that the FAB is at the bottom
-        Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Align(
-            alignment: Alignment.bottomRight,
-            child: FloatingActionButton(
-              onPressed: () {
-                _addSession();
-              },
-              child: Icon(Icons.add),
-            ),
           ),
         ),
       ],

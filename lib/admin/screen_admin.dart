@@ -76,6 +76,11 @@ class AdminScreenState extends State<AdminScreen> {
                   ),
             ],
           ),
+          floatingActionButton: FloatingActionButton(
+            //TODO: add _addSession in the corresponding tab
+            onPressed: null,
+            child: Icon(Icons.add),
+          ),
         ),
       ),
       onWillPop: () {

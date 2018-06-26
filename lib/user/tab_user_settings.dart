@@ -66,46 +66,12 @@ class TabUserSettingsState extends State<TabUserSettings> {
       child: Column(
         children: <Widget>[
           RaisedButton(
-            child: Text("Log in using Google"),
-            onPressed: () {
-              firebase_auth
-                  .handleSignIn()
-                  .then((onValue) {})
-                  .catchError((e) => print(e));
-            },
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 8.0),
-          ),
-          RaisedButton(
-            child: Text("Log out from Google"),
-            onPressed: () {
-              firebase_auth
-                  .handleSignOut()
-                  .then((onValue) {})
-                  .catchError((e) => print(e));
-            },
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 8.0),
-          ),
-          RaisedButton(
             child: Text("Scan QR code"),
             onPressed: scanBarcode,
           ),
           Text(spotifyCredetials),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.0),
-          ),
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Align(
-              alignment: Alignment.bottomRight,
-              child: FloatingActionButton(
-                onPressed: () {},
-                child: Icon(Icons.add),
-              ),
-            ),
           ),
         ],
       ),
