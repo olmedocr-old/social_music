@@ -64,27 +64,32 @@ class HomeScreen extends StatelessWidget {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return new AlertDialog(
-          title: new Text('Select the type of user you are'),
+          title: new Text('Select the type of user'),
           content: new SingleChildScrollView(
             child: new ListBody(
               children: <Widget>[
-                new Text('An admin user is able to create sessions.'),
-                new Text('A normal user is able to search and add songs.'),
+                new Text(
+                    'The admin is able to create sessions and must have a Spotify premium account.'),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4.0),
+                ),
+                new Text(
+                    'A normal user is able to search and add songs to the admin\'s Spotify account.'),
               ],
             ),
           ),
           actions: <Widget>[
             new FlatButton(
-              child: new Text('ADMIN',
-                  style: Theme.of(context).textTheme.button),
+              child:
+                  new Text('ADMIN', style: Theme.of(context).textTheme.button),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pushReplacementNamed("/admin");
               },
             ),
             new FlatButton(
-              child: new Text('NORMAL',
-                  style: Theme.of(context).textTheme.button),
+              child:
+                  new Text('NORMAL', style: Theme.of(context).textTheme.button),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pushReplacementNamed("/user");
@@ -105,6 +110,7 @@ class HomeScreen extends StatelessWidget {
     });
 
     return Scaffold(
+      backgroundColor: Theme.of(context).accentColor,
       body: widget,
     );
   }

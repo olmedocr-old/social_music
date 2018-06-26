@@ -75,9 +75,14 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
               padding: EdgeInsets.all(32.0),
               child: Center(
                 child: QrImage(
-                  version: 17,
-                  data: base64.encode(
-                      utf8.encode(credentialsFile.readAsStringSync() + userId)),
+                  version: 18,
+                  data: base64.encode(utf8.encode("{\"token\":" +
+                      credentialsFile.readAsStringSync() +
+                      ",\"adminId\":" +
+                      "\"" +
+                      userId +
+                      "\"" +
+                      "}")),
                   size: 300.0,
                 ),
               ),

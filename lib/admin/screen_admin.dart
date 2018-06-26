@@ -19,7 +19,7 @@ class AdminScreen extends StatefulWidget {
 }
 
 class AdminScreenState extends State<AdminScreen> {
-  //TODO: clean database code
+  //TODO: clean database code (very important to check listeners on both admin and user screens)
   FirebaseDatabase database;
   DatabaseError _error;
   DatabaseReference activeSessionReference;
@@ -75,11 +75,6 @@ class AdminScreenState extends State<AdminScreen> {
                   // de dataReady y tal
                   ),
             ],
-          ),
-          floatingActionButton: FloatingActionButton(
-            //TODO: add _addSession in the corresponding tab
-            onPressed: null,
-            child: Icon(Icons.add),
           ),
         ),
       ),

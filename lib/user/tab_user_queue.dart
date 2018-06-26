@@ -1,81 +1,93 @@
-/*
-Flexible(
-          child: FirebaseAnimatedList(
-            query: _nextReference,
-            itemBuilder: (BuildContext context, DataSnapshot snapshot,
-                Animation<double> animation, int index) {
-              return new SizeTransition(
-                  sizeFactor: animation,
-                  child: Card(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        ListTile(
-                          title: Text("$index: ${snapshot.value.toString()}"),
-                          subtitle: Text("unnamed"),
-                          leading: Image.network(
-                            'https://orig00.deviantart.net/e3c6/f/2016/248/3/a/mo___final_song__single__by_musiceverywere-dagl7kw.jpg',
-                            width: 64.0,
-                          ),
-                        ),
-                        ButtonTheme.bar(
-                          child: new ButtonBar(
-                            children: <Widget>[
-                              IconButton(
-                                icon: new Icon(Icons.favorite_border),
-                                onPressed: () {
-                                  /* ... */
-                                },
-                              ),
-                              new FlatButton(
-                                child: const Text('LISTEN'),
-                                onPressed: () {
-                                  /* ... */
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ));
-            },
-          ),
+import 'package:firebase_database/ui/firebase_sorted_list.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-
-
-           _nextSubscription = _nextReference.onValue.listen((Event event) {
-      setState(() {});
-    }, onError: (Object o) {
-      final DatabaseError error = o;
-      setState(() {
-        print(error);
-      });
-    });
-
-        _nextReference = widget.database.reference().child("admin-email/next");
-
- */
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class TabUserQueue extends StatefulWidget {
+  TabUserQueue({
+    Key key,
+    this.user,
+    this.rootReference,
+    this.activeSessionReference,
+    this.nextSongsReference,
+    this.nowPlayingReference,
+  }) : super(key: key);
+  final FirebaseUser user;
+  final DatabaseReference activeSessionReference;
+  final DatabaseReference rootReference;
+  final DatabaseReference nextSongsReference;
+  final DatabaseReference nowPlayingReference;
+
   @override
   State createState() => new TabUserQueueState();
 }
 
 class TabUserQueueState extends State<TabUserQueue> {
+  DatabaseReference newChild;
+
+  void _addSong() {
+    widget.nextSongsReference.push().set("Test");
+  }
+
+  void _markAsFavourite() {}
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(16.0),
-      child: Align(
-        alignment: Alignment.bottomRight,
-        child: FloatingActionButton(
-          onPressed: () {},
-          child: Icon(Icons.add),
+    //TODO: select the correct layout
+    return Column(
+      children: <Widget>[
+        Text("Now playing"),
+        Flexible(
+          child: FirebaseAnimatedList(
+            defaultChild: CircularProgressIndicator(),
+            query: widget.nowPlayingReference,
+            itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                Animation<double> animation, int index) {
+              return new SizeTransition(
+                sizeFactor: animation,
+                child: ListTile(
+                  leading: Text("Image"),
+                  title: Text("Data ${snapshot.value}"),
+                  trailing: Text("-3:25"),
+                ),
+              );
+            },
+          ),
         ),
-      ),
+        Text("Next in the queue"),
+        Flexible(
+          child: FirebaseAnimatedList(
+            defaultChild: CircularProgressIndicator(),
+            query: widget.nextSongsReference,
+            itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                Animation<double> animation, int index) {
+              return new SizeTransition(
+                sizeFactor: animation,
+                child: ListTile(
+                  leading: Text("Image"),
+                  title: Text("Data ${snapshot.value}"),
+                  trailing: IconButton(
+                    icon: Icon(Icons.favorite_border),
+                    onPressed: _markAsFavourite,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        Align(
+          alignment: Alignment.bottomRight,
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: FloatingActionButton(
+              onPressed: _addSong,
+              child: Icon(Icons.add),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,5 +1,4 @@
 // Create session, generate session code, encode in qr the id, view users in the session, terminate session
-import 'dart:async';
 import 'package:firebase_database/ui/firebase_sorted_list.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -28,7 +27,7 @@ class TabAdminSessionState extends State<TabAdminSession> {
   DatabaseReference newChild;
 
   void _addSession() {
-    if (!_sessionActive){
+    if (!_sessionActive) {
       widget.rootReference.update({widget.user.uid: ""});
       newChild = widget.rootReference.child(widget.user.uid);
       newChild.set(new Session(widget.user.displayName).toMap());
@@ -40,10 +39,9 @@ class TabAdminSessionState extends State<TabAdminSession> {
       //TODO: if the session already exists, manage the boolean that allows the wr creation and session addition
       _generateSnackBar("Session already active, delete it first");
     }
-
   }
 
-  void _removeSession(){
+  void _removeSession() {
     widget.rootReference.child(widget.user.uid).remove();
 
     _sessionActive = false;
@@ -80,7 +78,7 @@ class TabAdminSessionState extends State<TabAdminSession> {
         Flexible(
           child: FirebaseAnimatedList(
             defaultChild: CircularProgressIndicator(),
-            query: widget.rootReference.child(widget.user.uid),
+            query: widget.activeSessionReference.limitToFirst(1),
             itemBuilder: (BuildContext context, DataSnapshot snapshot,
                 Animation<double> animation, int index) {
               return new SizeTransition(
@@ -91,13 +89,21 @@ class TabAdminSessionState extends State<TabAdminSession> {
                   title: Text("Session author ${snapshot.value}"),
                   trailing: IconButton(
                     icon: Icon(Icons.delete),
-                    onPressed: () {
-                      _removeSession();
-                    },
+                    onPressed: _removeSession,
                   ),
                 ),
               );
             },
+          ),
+        ),
+        Align(
+          alignment: Alignment.bottomRight,
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: FloatingActionButton(
+              onPressed: _addSession,
+              child: Icon(Icons.add),
+            ),
           ),
         ),
       ],
