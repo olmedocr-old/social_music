@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -21,29 +22,6 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
   final String redirectUrl = null; //TODO: raulolmedo.com/callback
   final List<String> scopes = ["user-library-read"];
 
-  _onTap() async {
-    bool success = await Navigator.of(context).push(new MaterialPageRoute<bool>(
-      builder: (BuildContext context) =>
-      new SpotifyLoginWebViewPage(
-        clientId: this.clientId,
-        clientSecret: this.clientSecret,
-        redirectUrl: this.redirectUrl == null
-            ? "https://kunstmaan.github.io/flutter_slack_oauth/success.html"
-            : this.redirectUrl,
-        scopes: this.scopes,
-      ),
-    ));
-
-    if (success == null) {
-      _generateSnackBar("Webview closed");
-    } else if (success == false) {
-      _generateSnackBar("Login failed");
-    } else if (success) {
-      isLoginDataReady = true;
-      _generateSnackBar("Success");
-    }
-  }
-
   void _generateSnackBar(String text) {
     final snackBar = SnackBar(
       duration: Duration(seconds: 5),
@@ -59,6 +37,53 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
       ),
     );
     Scaffold.of(context).showSnackBar(snackBar);
+  }
+
+  void _openWebview() async {
+    bool success = await Navigator.of(context).push(new MaterialPageRoute<bool>(
+          builder: (BuildContext context) => new SpotifyLoginWebViewPage(
+                clientId: this.clientId,
+                clientSecret: this.clientSecret,
+                redirectUrl: this.redirectUrl == null
+                    ? "https://kunstmaan.github.io/flutter_slack_oauth/success.html"
+                    : this.redirectUrl,
+                scopes: this.scopes,
+              ),
+        ));
+
+    if (success == null) {
+      _generateSnackBar("Webview closed");
+    } else if (success == false) {
+      _generateSnackBar("Login failed");
+    } else if (success) {
+      isLoginDataReady = true;
+      _generateSnackBar("Success");
+    }
+  }
+
+  void _generateQr() async {
+    Directory tempDir = await getTemporaryDirectory();
+    File credentialsFile = File('${tempDir.path}/credentials');
+
+    print(credentialsFile.readAsStringSync());
+
+    showModalBottomSheet<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            child: Padding(
+              padding: EdgeInsets.all(32.0),
+              child: Center(
+                child: QrImage(
+                  version: 17,
+                  data: base64.encode(
+                      utf8.encode(credentialsFile.readAsStringSync() + userId)),
+                  size: 300.0,
+                ),
+              ),
+            ),
+          );
+        });
   }
 
   void _qrButtonPressed() {
@@ -78,30 +103,6 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
     });
   }
 
-  void _generateQr() async {
-    Directory tempDir = await getTemporaryDirectory();
-    File credentialsFile = File('${tempDir.path}/credentials');
-
-    print(credentialsFile.readAsStringSync());
-
-    showModalBottomSheet<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return Container(
-            child: Padding(
-              padding: EdgeInsets.all(32.0),
-              child: Center(
-                child: QrImage(
-                  version: 15,
-                  data: credentialsFile.readAsStringSync() + userId,
-                  size: 300.0,
-                ),
-              ),
-            ),
-          );
-        });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -117,7 +118,7 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
             child: Text("Login into Spotify"),
             onPressed: () {
               print("Spotify login");
-              _onTap();
+              _openWebview();
             },
           ),
           Padding(

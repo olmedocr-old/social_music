@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>Social Music</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -41,5 +43,22 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+    <string>Camera permission is required for barcode scanning.</string>
+	<!-- Put me in the [my_project]/ios/Runner/Info.plist file -->
+    <!-- Google Sign-in Section -->
+    <key>CFBundleURLTypes</key>
+    <array>
+    	<dict>
+    		<key>CFBundleTypeRole</key>
+    		<string>Editor</string>
+    		<key>CFBundleURLSchemes</key>
+    		<array>
+    			<!-- Copied from GoogleServices-Info.plist key REVERSE_CLIENT_ID -->
+    			<string>com.googleusercontent.apps.924211986379-e9omjbcl8o80j7tp5vuui5u84q016bqr</string>
+    		</array>
+    	</dict>
+    </array>
+    <!-- End of the Google Sign-in Section -->
 </dict>
 </plist>

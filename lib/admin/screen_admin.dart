@@ -5,7 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:social_music/admin/tab_admin_settings.dart';
+import 'tab_admin_settings.dart';
 import 'tab_admin_sessions.dart';
 
 class AdminScreen extends StatefulWidget {
@@ -19,6 +19,7 @@ class AdminScreen extends StatefulWidget {
 }
 
 class AdminScreenState extends State<AdminScreen> {
+  //TODO: clean database code
   FirebaseDatabase database;
   DatabaseError _error;
   DatabaseReference activeSessionReference;
@@ -48,28 +49,38 @@ class AdminScreenState extends State<AdminScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          bottom: TabBar(
-            tabs: [
-              Tab(text: "Session", icon: Icon(Icons.settings_ethernet)),
-              Tab(text: "Settings", icon: Icon(Icons.settings)),
-            ],
+    return WillPopScope(
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            bottom: TabBar(
+              tabs: [
+                Tab(text: "Session", icon: Icon(Icons.settings_ethernet)),
+                Tab(text: "Settings", icon: Icon(Icons.settings)),
+              ],
+            ),
+            title: Text(widget.title),
           ),
-          title: Text(widget.title),
-        ),
-        body: TabBarView(
-          children: [
-            TabAdminSession(
+          body: TabBarView(
+            children: [
+              TabAdminSession(
                 user: widget.user,
                 rootReference: this.rootReference,
-                activeSessionReference: this.activeSessionReference),
-            TabAdminSettings(),
-          ],
+                activeSessionReference: this.activeSessionReference,
+              ),
+              TabAdminSettings(
+                  //TODO: pasar aqui las variables en vez de importar dos clases del
+                  // mismo nivel (user_settings y user_queue) con los booleanos
+                  // de dataReady y tal
+                  ),
+            ],
+          ),
         ),
       ),
+      onWillPop: () {
+        return new Future(() => false);
+      },
     );
   }
 

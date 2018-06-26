@@ -27,7 +27,7 @@ class TabAdminSessionState extends State<TabAdminSession> {
   bool _sessionActive = false;
   DatabaseReference newChild;
 
-  _addSession() {
+  void _addSession() {
     if (!_sessionActive){
       widget.rootReference.update({widget.user.uid: ""});
       newChild = widget.rootReference.child(widget.user.uid);
@@ -42,7 +42,7 @@ class TabAdminSessionState extends State<TabAdminSession> {
 
   }
 
-  _removeSession(){
+  void _removeSession(){
     widget.rootReference.child(widget.user.uid).remove();
 
     _sessionActive = false;
@@ -99,6 +99,7 @@ class TabAdminSessionState extends State<TabAdminSession> {
             },
           ),
         ),
+        //TODO: change layout from Column to other thing to ensure that the FAB is at the bottom
         Padding(
           padding: EdgeInsets.all(16.0),
           child: Align(

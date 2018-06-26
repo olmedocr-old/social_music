@@ -23,7 +23,6 @@ Future<FirebaseUser> handleSignIn() async {
 }
 
 Future<Null> handleSignOut() async {
-  //TODO:
   _auth.signOut();
   _googleSignIn.signOut();
   print("Signed out successfully");

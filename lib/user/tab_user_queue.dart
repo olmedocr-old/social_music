@@ -56,3 +56,17 @@ Flexible(
         _nextReference = widget.database.reference().child("admin-email/next");
 
  */
+import 'package:flutter/material.dart';
+
+class TabUserQueue extends StatefulWidget {
+  @override
+  State createState() => new TabUserQueueState();
+}
+
+class TabUserQueueState extends State<TabUserQueue> {
+
+  @override
+  Widget build(BuildContext context) {
+    return Text("Text");
+  }
+}
