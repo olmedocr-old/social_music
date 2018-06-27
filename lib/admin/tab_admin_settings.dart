@@ -1,17 +1,21 @@
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'tab_admin_sessions.dart';
 
+import 'screen_admin.dart';
 import 'package:social_music/spotify_authentication.dart';
 
-bool isLoginDataReady = false;
-bool isSessionDataReady = false;
-
 class TabAdminSettings extends StatefulWidget {
+  TabAdminSettings(
+      {Key key,
+      this.user})
+      : super(key: key);
+  final FirebaseUser user;
+
   @override
   State createState() => new TabAdminSettingsState();
 }
@@ -56,7 +60,7 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
     } else if (success == false) {
       _generateSnackBar("Login failed");
     } else if (success) {
-      isLoginDataReady = true;
+      AdminScreenState.isLoginDataReady = true;
       _generateSnackBar("Success");
     }
   }
@@ -80,7 +84,7 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
                       credentialsFile.readAsStringSync() +
                       ",\"adminId\":" +
                       "\"" +
-                      userId +
+                      widget.user.uid +
                       "\"" +
                       "}")),
                   size: 300.0,
@@ -93,12 +97,13 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
 
   void _qrButtonPressed() {
     setState(() {
-      if (isLoginDataReady && isSessionDataReady) {
+      if (AdminScreenState.isLoginDataReady &&
+          (AdminScreenState.isRemoteSessionDataReady || AdminScreenState.isSessionDataReady)) {
         _generateQr();
-      } else if (!isLoginDataReady) {
+      } else if (!AdminScreenState.isLoginDataReady) {
         _generateSnackBar(
             'You must login first into Spotify to generate the QR code');
-      } else if (!isSessionDataReady) {
+      } else if (!AdminScreenState.isSessionDataReady) {
         _generateSnackBar(
             "You must create a session before generating the QR code");
       } else {

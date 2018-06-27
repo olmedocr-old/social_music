@@ -26,12 +26,20 @@ class TabUserQueue extends StatefulWidget {
 
 class TabUserQueueState extends State<TabUserQueue> {
   DatabaseReference newChild;
+  int _debugIndex = 0;
 
   void _addSong() {
-    widget.nextSongsReference.push().set("Test");
+    _debugIndex++;
+    widget.nextSongsReference
+        .push()
+        .set({"Track": 'Spotify track object', 'favsNumber': _debugIndex});
   }
 
-  void _markAsFavourite() {}
+  void _markAsFavourite(DataSnapshot snapshot) {
+    print('Fav');
+    print(context.widget.toString());
+    print(snapshot.value['favsNumber']);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,13 +74,20 @@ class TabUserQueueState extends State<TabUserQueue> {
               return new SizeTransition(
                 sizeFactor: animation,
                 child: ListTile(
-                  leading: Text("Image"),
-                  title: Text("Data ${snapshot.value}"),
-                  trailing: IconButton(
-                    icon: Icon(Icons.favorite_border),
-                    onPressed: _markAsFavourite,
-                  ),
-                ),
+                    leading: Text("Image"),
+                    title: Text("Data: ${snapshot.value['Track']}"),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Text(snapshot.value['favsNumber'].toString()),
+                        IconButton(
+                          icon: Icon(Icons.favorite_border),
+                          onPressed: () {
+                            _markAsFavourite(snapshot);
+                          },
+                        ),
+                      ],
+                    )),
               );
             },
           ),

@@ -1,51 +1,42 @@
-// Create session, generate session code, encode in qr the id, view users in the session, terminate session
-import 'package:firebase_database/ui/firebase_sorted_list.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'tab_admin_settings.dart';
-import 'package:social_music/session.dart';
-
-String userId;
+import 'screen_admin.dart';
 
 class TabAdminSession extends StatefulWidget {
   TabAdminSession(
-      {Key key, this.user, this.rootReference, this.activeSessionReference})
+      {Key key,
+      this.user,
+      this.activeSessionReference})
       : super(key: key);
   final FirebaseUser user;
   final DatabaseReference activeSessionReference;
-  final DatabaseReference rootReference;
 
   @override
   State createState() => new TabAdminSessionState();
 }
 
 class TabAdminSessionState extends State<TabAdminSession> {
-  bool _sessionActive = false;
   DatabaseReference newChild;
 
   void _addSession() {
-    if (!_sessionActive) {
-      widget.rootReference.update({widget.user.uid: ""});
-      newChild = widget.rootReference.child(widget.user.uid);
-      newChild.set(new Session(widget.user.displayName).toMap());
+    if (!(AdminScreenState.isSessionDataReady || AdminScreenState.isRemoteSessionDataReady)) {
+      widget.activeSessionReference.set({
+        "adminName": widget.user.displayName,
+      });
 
-      userId = widget.user.uid;
-      _sessionActive = true;
-      isSessionDataReady = true;
+      AdminScreenState.isSessionDataReady = true;
     } else {
-      //TODO: if the session already exists, manage the boolean that allows the wr creation and session addition
       _generateSnackBar("Session already active, delete it first");
     }
   }
 
   void _removeSession() {
-    widget.rootReference.child(widget.user.uid).remove();
+    widget.activeSessionReference.remove();
 
-    _sessionActive = false;
-    isSessionDataReady = false;
+    AdminScreenState.isSessionDataReady = false;
   }
 
   void _generateSnackBar(String text) {
@@ -85,8 +76,7 @@ class TabAdminSessionState extends State<TabAdminSession> {
                 sizeFactor: animation,
                 child: ListTile(
                   leading: Image.network(widget.user.photoUrl),
-                  //TODO: take only the child with the name, maybe is a listener problem
-                  title: Text("Session author ${snapshot.value}"),
+                  title: Text("Session author: ${snapshot.value}"),
                   trailing: IconButton(
                     icon: Icon(Icons.delete),
                     onPressed: _removeSession,

@@ -19,12 +19,14 @@ class AdminScreen extends StatefulWidget {
 }
 
 class AdminScreenState extends State<AdminScreen> {
-  //TODO: clean database code (very important to check listeners on both admin and user screens)
   FirebaseDatabase database;
   DatabaseError _error;
   DatabaseReference activeSessionReference;
-  DatabaseReference rootReference;
   StreamSubscription<Event> activeSessionSubscription;
+  static bool isRemoteSessionDataReady = false;
+  static bool isLoginDataReady = false;
+  static bool isSessionDataReady = false;
+
 
   @override
   void initState() {
@@ -34,10 +36,16 @@ class AdminScreenState extends State<AdminScreen> {
     database.setPersistenceCacheSizeBytes(10000000);
 
     activeSessionReference = database.reference().child(widget.user.uid);
-    rootReference = database.reference().root();
+    activeSessionReference.keepSynced(true);
 
     activeSessionSubscription =
         activeSessionReference.onValue.listen((Event event) {
+      print("activeSessionSubscription triggered");
+      if (event.snapshot.value != null) {
+        isRemoteSessionDataReady = true;
+      } else {
+        isRemoteSessionDataReady = false;
+      }
       setState(() {});
     }, onError: (Object o) {
       final DatabaseError error = o;
@@ -66,14 +74,11 @@ class AdminScreenState extends State<AdminScreen> {
             children: [
               TabAdminSession(
                 user: widget.user,
-                rootReference: this.rootReference,
                 activeSessionReference: this.activeSessionReference,
               ),
               TabAdminSettings(
-                  //TODO: pasar aqui las variables en vez de importar dos clases del
-                  // mismo nivel (user_settings y user_queue) con los booleanos
-                  // de dataReady y tal
-                  ),
+                user: widget.user,
+              ),
             ],
           ),
         ),
