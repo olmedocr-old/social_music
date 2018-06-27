@@ -1,15 +1,16 @@
+import 'dart:io' show Platform;
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/material.dart';
+
 import 'screen_admin.dart';
 
 class TabAdminSession extends StatefulWidget {
-  TabAdminSession(
-      {Key key,
-      this.user,
-      this.activeSessionReference})
+  TabAdminSession({Key key, this.user, this.activeSessionReference})
       : super(key: key);
   final FirebaseUser user;
   final DatabaseReference activeSessionReference;
@@ -22,7 +23,8 @@ class TabAdminSessionState extends State<TabAdminSession> {
   DatabaseReference newChild;
 
   void _addSession() {
-    if (!(AdminScreenState.isSessionDataReady || AdminScreenState.isRemoteSessionDataReady)) {
+    if (!(AdminScreenState.isSessionDataReady ||
+        AdminScreenState.isRemoteSessionDataReady)) {
       widget.activeSessionReference.set({
         "adminName": widget.user.displayName,
       });
@@ -68,7 +70,9 @@ class TabAdminSessionState extends State<TabAdminSession> {
         Text("Active sessions"),
         Flexible(
           child: FirebaseAnimatedList(
-            defaultChild: CircularProgressIndicator(),
+            defaultChild: Platform.isIOS
+                ? CupertinoActivityIndicator()
+                : CircularProgressIndicator(),
             query: widget.activeSessionReference.limitToFirst(1),
             itemBuilder: (BuildContext context, DataSnapshot snapshot,
                 Animation<double> animation, int index) {

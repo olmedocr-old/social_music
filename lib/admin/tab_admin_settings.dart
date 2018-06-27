@@ -10,10 +10,7 @@ import 'screen_admin.dart';
 import 'package:social_music/spotify_authentication.dart';
 
 class TabAdminSettings extends StatefulWidget {
-  TabAdminSettings(
-      {Key key,
-      this.user})
-      : super(key: key);
+  TabAdminSettings({Key key, this.user}) : super(key: key);
   final FirebaseUser user;
 
   @override
@@ -98,7 +95,8 @@ class TabAdminSettingsState extends State<TabAdminSettings> {
   void _qrButtonPressed() {
     setState(() {
       if (AdminScreenState.isLoginDataReady &&
-          (AdminScreenState.isRemoteSessionDataReady || AdminScreenState.isSessionDataReady)) {
+          (AdminScreenState.isRemoteSessionDataReady ||
+              AdminScreenState.isSessionDataReady)) {
         _generateQr();
       } else if (!AdminScreenState.isLoginDataReady) {
         _generateSnackBar(

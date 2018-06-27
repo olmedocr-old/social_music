@@ -1,9 +1,12 @@
+import 'dart:io' show Platform;
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 import 'package:firebase_database/ui/firebase_sorted_list.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/material.dart';
 
 class TabUserQueue extends StatefulWidget {
   TabUserQueue({
@@ -49,7 +52,9 @@ class TabUserQueueState extends State<TabUserQueue> {
         Text("Now playing"),
         Flexible(
           child: FirebaseAnimatedList(
-            defaultChild: CircularProgressIndicator(),
+            defaultChild: Platform.isIOS
+                ? CupertinoActivityIndicator()
+                : CircularProgressIndicator(),
             query: widget.nowPlayingReference,
             itemBuilder: (BuildContext context, DataSnapshot snapshot,
                 Animation<double> animation, int index) {
@@ -67,7 +72,9 @@ class TabUserQueueState extends State<TabUserQueue> {
         Text("Next in the queue"),
         Flexible(
           child: FirebaseAnimatedList(
-            defaultChild: CircularProgressIndicator(),
+            defaultChild: Platform.isIOS
+                ? CupertinoActivityIndicator()
+                : CircularProgressIndicator(),
             query: widget.nextSongsReference,
             itemBuilder: (BuildContext context, DataSnapshot snapshot,
                 Animation<double> animation, int index) {

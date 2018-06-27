@@ -1,12 +1,15 @@
+import 'dart:io' show Platform;
 import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:barcode_scan/barcode_scan.dart';
-import 'package:flutter/services.dart';
 
 import 'tab_user_queue.dart';
 
@@ -23,7 +26,6 @@ class UserScreen extends StatefulWidget {
 class UserScreenState extends State<UserScreen> {
   bool hasScanned = false;
 
-  //TODO: clean database code
   FirebaseDatabase database;
   DatabaseError _error;
   DatabaseReference nextSongsReference;
@@ -43,25 +45,25 @@ class UserScreenState extends State<UserScreen> {
 
     nextSongsSubscription =
         nextSongsReference.onChildAdded.listen((Event event) {
-      print("nextSongsSubscription triggered");
-      setState(() {});
-    }, onError: (Object o) {
-      final DatabaseError error = o;
-      setState(() {
-        _error = error;
-      });
-    });
+          print("nextSongsSubscription triggered");
+          setState(() {});
+        }, onError: (Object o) {
+          final DatabaseError error = o;
+          setState(() {
+            _error = error;
+          });
+        });
 
     nowPlayingSubscription =
         nowPlayingReference.onChildChanged.listen((Event event) {
-      print("nowPlayingSubscription triggered");
-      setState(() {});
-    }, onError: (Object o) {
-      final DatabaseError error = o;
-      setState(() {
-        _error = error;
-      });
-    });
+          print("nowPlayingSubscription triggered");
+          setState(() {});
+        }, onError: (Object o) {
+          final DatabaseError error = o;
+          setState(() {
+            _error = error;
+          });
+        });
   }
 
   Future _scanBarcode() async {
@@ -92,40 +94,82 @@ class UserScreenState extends State<UserScreen> {
     }
   }
 
-  Future<Widget> _showDialog(
-      BuildContext context, String title, String body, String button) async {
+  Widget _iOSDialog(BuildContext context, String title, String body,
+      String button) {
+    return new WillPopScope(
+      child: CupertinoAlertDialog(
+        title: new Text(title),
+        content: new SingleChildScrollView(
+          child: new ListBody(
+            children: <Widget>[
+              new Text(body),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          CupertinoButton(
+              child: new Text(button, style: Theme
+                  .of(context)
+                  .textTheme
+                  .button),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _scanBarcode();
+              }),
+        ],
+      ),
+      onWillPop: () {
+        return new Future(() => false);
+      },
+    );
+  }
+
+  Widget _androidDialog(BuildContext context, String title, String body,
+      String button) {
+    return new WillPopScope(
+      child: AlertDialog(
+        title: new Text(title),
+        content: new SingleChildScrollView(
+          child: new ListBody(
+            children: <Widget>[
+              new Text(body),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          new FlatButton(
+            child: new Text(button, style: Theme
+                .of(context)
+                .textTheme
+                .button),
+            onPressed: () {
+              Navigator.of(context).pop();
+              _scanBarcode();
+            },
+          ),
+        ],
+      ),
+      onWillPop: () {
+        return new Future(() => false);
+      },
+    );
+  }
+
+  Future<Widget> _showDialog(BuildContext context, String title, String body,
+      String button) async {
     return showDialog<Widget>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        return new WillPopScope(
-          child: AlertDialog(
-            title: new Text(title),
-            content: new SingleChildScrollView(
-              child: new ListBody(
-                children: <Widget>[
-                  new Text(body),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                child:
-                    new Text(button, style: Theme.of(context).textTheme.button),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _scanBarcode();
-                },
-              ),
-            ],
-          ),
-          onWillPop: () {
-            return new Future(() => false);
-          },
-        );
+        if (Platform.isIOS) {
+          return _iOSDialog(context, title, body, button);
+        } else {
+          return _androidDialog(context, title, body, button);
+        }
       },
     );
   }
+
 
   @override
   void initState() {
@@ -149,7 +193,9 @@ class UserScreenState extends State<UserScreen> {
         widget = onValue;
       });
       return Scaffold(
-        backgroundColor: Theme.of(context).accentColor,
+        backgroundColor: Theme
+            .of(context)
+            .accentColor,
         body: widget,
       );
     } else {

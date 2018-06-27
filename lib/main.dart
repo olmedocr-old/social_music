@@ -2,11 +2,13 @@ import 'dart:io' show Platform;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:social_music/admin/screen_admin.dart';
-import 'package:social_music/user/screen_user.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'package:social_music/admin/screen_admin.dart';
+import 'package:social_music/user/screen_user.dart';
 import 'firebase_authentication.dart';
 
 FirebaseUser user;
@@ -56,6 +58,76 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Widget _iOSDialog(BuildContext context) {
+    return CupertinoAlertDialog(
+      title: new Text('Select the type of user'),
+      content: new SingleChildScrollView(
+        child: new ListBody(
+          children: <Widget>[
+            new Text(
+                'The admin is able to create sessions and must have a Spotify premium account.'),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 4.0),
+            ),
+            new Text(
+                'A normal user is able to search and add songs to the admin\'s Spotify account.'),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        CupertinoButton(
+          child: new Text('ADMIN', style: Theme.of(context).textTheme.button),
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pushReplacementNamed("/admin");
+          },
+        ),
+        CupertinoButton(
+            child:
+                new Text('NORMAL', style: Theme.of(context).textTheme.button),
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pushReplacementNamed("/user");
+            }),
+      ],
+    );
+  }
+
+  Widget _androidDialog(BuildContext context) {
+    return AlertDialog(
+      title: new Text('Select the type of user'),
+      content: new SingleChildScrollView(
+        child: new ListBody(
+          children: <Widget>[
+            new Text(
+                'The admin is able to create sessions and must have a Spotify premium account.'),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 4.0),
+            ),
+            new Text(
+                'A normal user is able to search and add songs to the admin\'s Spotify account.'),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        new FlatButton(
+          child: new Text('ADMIN', style: Theme.of(context).textTheme.button),
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pushReplacementNamed("/admin");
+          },
+        ),
+        new FlatButton(
+          child: new Text('NORMAL', style: Theme.of(context).textTheme.button),
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pushReplacementNamed("/user");
+          },
+        ),
+      ],
+    );
+  }
+
   Future<Widget> _showDialog(BuildContext context) async {
     user = await _loginFirebase();
     app = await _initFirebase();
@@ -63,40 +135,11 @@ class HomeScreen extends StatelessWidget {
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        return new AlertDialog(
-          title: new Text('Select the type of user'),
-          content: new SingleChildScrollView(
-            child: new ListBody(
-              children: <Widget>[
-                new Text(
-                    'The admin is able to create sessions and must have a Spotify premium account.'),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 4.0),
-                ),
-                new Text(
-                    'A normal user is able to search and add songs to the admin\'s Spotify account.'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            new FlatButton(
-              child:
-                  new Text('ADMIN', style: Theme.of(context).textTheme.button),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pushReplacementNamed("/admin");
-              },
-            ),
-            new FlatButton(
-              child:
-                  new Text('NORMAL', style: Theme.of(context).textTheme.button),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pushReplacementNamed("/user");
-              },
-            ),
-          ],
-        );
+        if (Platform.isIOS) {
+          return _iOSDialog(context);
+        } else {
+          return _androidDialog(context);
+        }
       },
     );
   }

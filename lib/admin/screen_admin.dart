@@ -27,7 +27,6 @@ class AdminScreenState extends State<AdminScreen> {
   static bool isLoginDataReady = false;
   static bool isSessionDataReady = false;
 
-
   @override
   void initState() {
     super.initState();
