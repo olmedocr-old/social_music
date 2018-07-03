@@ -12,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 
 import 'tab_user_queue.dart';
+import 'tab_user_search.dart';
 
 class UserScreen extends StatefulWidget {
   UserScreen({Key key, this.title, this.app, this.user}) : super(key: key);
@@ -39,7 +40,6 @@ class UserScreenState extends State<UserScreen> {
   }
 
   void _setupListeners(String adminUserId) {
-    //TODO: check this subscriptions, maybe are reduntant
     nextSongsReference = database.reference().child("$adminUserId/nextSongs");
     nowPlayingReference = database.reference().child("$adminUserId/nowPlaying");
 
@@ -214,10 +214,9 @@ class UserScreenState extends State<UserScreen> {
             ),
             body: TabBarView(
               children: [
-                Center(
-                  child: Text("Aqui va el buscador"),
-                ),
+                TabUserSearch(),
                 TabUserQueue(
+                  database: this.database,
                   user: widget.user,
                   nextSongsReference: this.nextSongsReference,
                   nowPlayingReference: this.nowPlayingReference,

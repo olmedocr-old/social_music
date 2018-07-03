@@ -1,4 +1,6 @@
 import 'dart:io' show Platform;
+import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,14 +11,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class TabUserQueue extends StatefulWidget {
-  TabUserQueue({
-    Key key,
-    this.user,
-    this.rootReference,
-    this.activeSessionReference,
-    this.nextSongsReference,
-    this.nowPlayingReference,
-  }) : super(key: key);
+  TabUserQueue(
+      {Key key,
+      this.user,
+      this.rootReference,
+      this.activeSessionReference,
+      this.nextSongsReference,
+      this.nowPlayingReference,
+      this.database})
+      : super(key: key);
+  final FirebaseDatabase database;
   final FirebaseUser user;
   final DatabaseReference activeSessionReference;
   final DatabaseReference rootReference;
@@ -29,19 +33,55 @@ class TabUserQueue extends StatefulWidget {
 
 class TabUserQueueState extends State<TabUserQueue> {
   DatabaseReference newChild;
-  int _debugIndex = 0;
 
   void _addSong() {
-    _debugIndex++;
-    widget.nextSongsReference
-        .push()
-        .set({"Track": 'Spotify track object', 'favsNumber': _debugIndex});
+    newChild = widget.nextSongsReference.push();
+
+    newChild.set({
+      "Track": 'Spotify track object',
+      'favsNumber': 0,
+      "addedByUser": widget.user.uid,
+      "favedByUsers": [""]
+    });
   }
 
-  void _markAsFavourite(DataSnapshot snapshot) {
-    print('Fav');
-    print(context.widget.toString());
-    print(snapshot.value['favsNumber']);
+  void _deleteSong(DataSnapshot snapshot) {
+    widget.nextSongsReference.child(snapshot.key).remove();
+  }
+
+  Future<Null> _markAsFavourite(DataSnapshot snapshot) async {
+    final TransactionResult transactionResult = await widget.nextSongsReference
+        .child(snapshot.key)
+        .runTransaction((MutableData mutableData) async {
+      List<dynamic> list =
+          List.from(mutableData.value['favedByUsers'], growable: true);
+
+      if (list.contains(widget.user.uid)) {
+        mutableData.value['favsNumber'] = mutableData.value['favsNumber'] + 1;
+
+        list.remove(widget.user.uid);
+
+        mutableData.value['favedByUsers'] = list;
+
+        return mutableData;
+      } else {
+        mutableData.value['favsNumber'] = mutableData.value['favsNumber'] - 1;
+
+        list.add(widget.user.uid);
+
+        mutableData.value['favedByUsers'] = list;
+
+        return mutableData;
+      }
+    });
+    if (transactionResult.committed) {
+      print('Transaction committed successfully.');
+    } else {
+      print('Transaction not committed.');
+      if (transactionResult.error != null) {
+        print(transactionResult.error.message);
+      }
+    }
   }
 
   @override
@@ -75,9 +115,21 @@ class TabUserQueueState extends State<TabUserQueue> {
             defaultChild: Platform.isIOS
                 ? CupertinoActivityIndicator()
                 : CircularProgressIndicator(),
-            query: widget.nextSongsReference,
+            query: widget.nextSongsReference.orderByChild("favsNumber"),
             itemBuilder: (BuildContext context, DataSnapshot snapshot,
                 Animation<double> animation, int index) {
+              bool _isDeleteable = false;
+              bool _isFavorited = false;
+
+              if (snapshot.value['addedByUser'] == widget.user.uid) {
+                _isDeleteable = true;
+              }
+
+              if (List
+                  .from(snapshot.value['favedByUsers'])
+                  .contains(widget.user.uid)) {
+                _isFavorited = true;
+              }
               return new SizeTransition(
                 sizeFactor: animation,
                 child: ListTile(
@@ -86,13 +138,22 @@ class TabUserQueueState extends State<TabUserQueue> {
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        Text(snapshot.value['favsNumber'].toString()),
-                        IconButton(
-                          icon: Icon(Icons.favorite_border),
-                          onPressed: () {
-                            _markAsFavourite(snapshot);
-                          },
-                        ),
+                        Text((snapshot.value['favsNumber'] * -1).toString()),
+                        _isDeleteable
+                            ? IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () {
+                                  _deleteSong(snapshot);
+                                },
+                              )
+                            : IconButton(
+                                icon: _isFavorited
+                                    ? Icon(Icons.favorite, color: Colors.red)
+                                    : Icon(Icons.favorite_border),
+                                onPressed: () {
+                                  _markAsFavourite(snapshot);
+                                },
+                              ),
                       ],
                     )),
               );

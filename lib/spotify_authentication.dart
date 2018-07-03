@@ -51,6 +51,9 @@ class _SpotifyLoginWebViewPageState extends State<SpotifyLoginWebViewPage> {
               await grant.handleAuthorizationResponse(uri.queryParameters);
 
           // Save credentials on temporal directory
+          //TODO: esto es una puta guarreria (lo de pasarse el login por un archivo)
+          // Por ejemplo guardarlo en un directorio normal y en el temporal si no esta el del
+          // directorio normal, pero hay que ver si un token antiguo vale si se usan otros.
           Directory tempDir = await getTemporaryDirectory();
           File credentialsFile = new File('${tempDir.path}/credentials');
           await credentialsFile.writeAsString(client.credentials.toJson());

@@ -45,6 +45,8 @@
 	<false/>
 	<key>NSCameraUsageDescription</key>
     <string>Camera permission is required for barcode scanning.</string>
+    <key>UIApplicationExitsOnSuspend</key>
+    <false/>
 	<!-- Put me in the [my_project]/ios/Runner/Info.plist file -->
     <!-- Google Sign-in Section -->
     <key>CFBundleURLTypes</key>
