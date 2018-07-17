@@ -76,7 +76,7 @@ class HomeScreen extends StatelessWidget {
       ),
       actions: <Widget>[
         CupertinoButton(
-          child: new Text('ADMIN', style: Theme.of(context).textTheme.button),
+          child: new Text('Admin'),
           onPressed: () {
             Navigator.of(context).pop();
             Navigator.of(context).pushReplacementNamed("/admin");
@@ -84,7 +84,7 @@ class HomeScreen extends StatelessWidget {
         ),
         CupertinoButton(
             child:
-                new Text('NORMAL', style: Theme.of(context).textTheme.button),
+                new Text('Normal'),
             onPressed: () {
               Navigator.of(context).pop();
               Navigator.of(context).pushReplacementNamed("/user");
@@ -146,15 +146,18 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget widget;
-
-    _showDialog(context).then((onValue) {
-      widget = onValue;
-    });
-
     return Scaffold(
       backgroundColor: Theme.of(context).accentColor,
-      body: widget,
+      body: FutureBuilder(
+        future: _showDialog(context),
+        builder: (context, snapshot) {
+          return Center(
+            child: Platform.isIOS
+                ? CupertinoActivityIndicator()
+                : CircularProgressIndicator(),
+          );
+        },
+      ),
     );
   }
 }

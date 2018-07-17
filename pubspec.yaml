@@ -13,12 +13,12 @@ dependencies:
   qr_flutter: "^1.1.1"
   path_provider: "^0.4.1"
   barcode_scan: "^0.0.4"
-  flutter_search_bar: "^2.0.4"
   spotify:
     git:
       #url: https://github.com/RaulOlmedoCheca/spotify-dart.git
       url: https://github.com/chances/spotify-dart.git
-      ref: token-supplier
+      ref: party
+      #url: https://github.com/rinukkusu/spotify-dart.git
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
